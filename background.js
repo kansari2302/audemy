@@ -6,13 +6,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function findAndProcessTabs() {
-  console.log('Starting to find and process tabs.');
-  chrome.tabs.query({}, (allTabs) => {
-    console.log('All open tabs:', allTabs);
-  });
-
-  chrome.tabs.query({ url: "https://real.discount/offer/*" }, (tabs) => {
-    console.log(`Found ${tabs.length} matching tabs.`);
+  console.log('Starting to find and process tabs in the current window.');
+  chrome.tabs.query({ url: "https://real.discount/offer/*", currentWindow: true }, (tabs) => {
+    console.log(`Found ${tabs.length} matching tabs in the current window.`);
     if (tabs.length === 0) {
       console.log('No matching tabs found.');
       return;
