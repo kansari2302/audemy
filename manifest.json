@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Real Discount Link Opener",
+  "version": "1.0",
+  "description": "Finds and opens the final offer link from real.discount tabs.",
+  "permissions": [
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://real.discount/offer/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Open Discount Links"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
