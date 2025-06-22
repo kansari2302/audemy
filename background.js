@@ -7,6 +7,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function findAndProcessTabs() {
   console.log('Starting to find and process tabs in the current window.');
+  chrome.tabs.query({}, (allTabs) => {
+    console.log('All open tab URLs:', allTabs.map(tab => tab.url));
+  });
   chrome.tabs.query({ url: "https://real.discount/offer/*", currentWindow: true }, (tabs) => {
     console.log(`Found ${tabs.length} matching tabs in the current window.`);
     if (tabs.length === 0) {
