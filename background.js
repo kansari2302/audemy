@@ -10,7 +10,7 @@ function findAndProcessTabs() {
   chrome.tabs.query({}, (allTabs) => {
     console.log('All open tab URLs:', allTabs.map(tab => tab.url));
   });
-  chrome.tabs.query({ url: "https://real.discount/offer/*", currentWindow: true }, (tabs) => {
+  chrome.tabs.query({ url: ["https://real.discount/offer/*", "https://www.real.discount/offer/*"], currentWindow: true }, (tabs) => {
     console.log(`Found ${tabs.length} matching tabs in the current window.`);
     if (tabs.length === 0) {
       console.log('No matching tabs found.');

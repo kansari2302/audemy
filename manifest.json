@@ -8,7 +8,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://real.discount/offer/*"
+    "https://real.discount/offer/*",
+    "https://www.real.discount/offer/*"
   ],
   "action": {
     "default_popup": "popup.html",
