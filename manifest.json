@@ -5,11 +5,21 @@
   "description": "Finds and opens the final offer link from real.discount tabs.",
   "permissions": [
     "tabs",
-    "scripting"
+    "scripting",
+    "activeTab"
   ],
   "host_permissions": [
-    "https://real.discount/offer/*",
-    "https://www.real.discount/offer/*"
+    "*://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content.js"],
+      "matches": ["https://real.discount/*", "https://www.real.discount/*"]
+    },
+    {
+      "resources": ["udemy_content.js"],
+      "matches": ["*://*.udemy.com/*"]
+    }
   ],
   "action": {
     "default_popup": "popup.html",
