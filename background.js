@@ -6,6 +6,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     openAllCourseLinks();
   } else if (request.action === 'closeUdemyTabs') {
     closeUdemyTabsWithTag();
+  } else if (request.action === 'copyTabUrls') {
+    // Return URLs of all tabs in current window except Real.Discount listing pages
+    chrome.tabs.query({ currentWindow: true }, (tabs) => {
+      try {
+        const urls = tabs
+          .map(t => t.url || '')
+          .filter(u => {
+            try {
+              const parsed = new URL(u);
+              if (!/^https?:$/i.test(parsed.protocol)) return false; // exclude chrome://, edge://, etc.
+              const isRD = /(^|\.)real\.discount$/i.test(parsed.hostname);
+              const isCourses = parsed.pathname.toLowerCase().startsWith('/courses');
+              return !(isRD && isCourses);
+            } catch {
+              return false;
+            }
+          });
+        sendResponse({ urls });
+      } catch (e) {
+        console.error('copyTabUrls failed:', e);
+        sendResponse({ urls: [] });
+      }
+    });
+    return true; // keep message channel open
   }
 });
 
@@ -15,7 +39,7 @@ function closeUdemyTabsWithTag() {
     console.log(`closeUdemyTabsWithTag: Found ${tabs.length} Udemy tabs.`);
     if (tabs.length === 0) {
       console.log('closeUdemyTabsWithTag: No Udemy tabs found.');
-      alert('No Udemy tabs found to check.');
+      // alert is not available in service workers; log instead
       return;
     }
 
@@ -60,8 +84,12 @@ function openAllCourseLinks() {
     const url = activeTab.url;
     console.log(`openAllCourseLinks: Active tab URL: ${url}`);
 
-    // Check if the URL matches the real.discount courses page pattern
-    if (url.startsWith('https://www.real.discount/courses?page=') || url.startsWith('https://real.discount/courses?page=')) {
+    // Check if the URL matches the real.discount courses page pattern (more robust)
+    try {
+      const u = new URL(url);
+      const hostOk = /(^|\.)real\.discount$/i.test(u.hostname);
+      const pathOk = u.pathname.toLowerCase().startsWith('/courses');
+      if (hostOk && pathOk) {
       console.log('openAllCourseLinks: URL matches RealDiscount courses page pattern. Injecting content.js.');
       chrome.scripting.executeScript(
         {
@@ -90,9 +118,11 @@ function openAllCourseLinks() {
           });
         }
       );
-    } else {
-      console.log('openAllCourseLinks: Current tab is not a real.discount courses page. URL:', url);
-      alert('Please navigate to a Real.Discount courses page (e.g., https://www.real.discount/courses?page=1) to use this feature.');
+      } else {
+        console.warn('openAllCourseLinks: Current tab is not a real.discount courses page. URL:', url);
+      }
+    } catch (e) {
+      console.error('openAllCourseLinks: Failed to parse URL:', e);
     }
   });
 }
